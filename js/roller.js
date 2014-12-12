@@ -22,12 +22,15 @@ define(function () {
     	var rolls = $(root).children();
 	    var rollCount = rolls.length;
 	    // add first to end for a smooth loop
-	    rolls.push($(rolls[0]).clone().appendTo(root));
+	    $(rolls[0]).clone().appendTo(root);
+	    rolls = $(root).children();
 	    
+		var stopFunc;
+
 	    function move () {
-	        var finalRoll;
-	        var kill = function (at) {
-	            finalRoll = Math.floor(at);
+	        var stop = false;
+	        var kill = function () {
+	            stop = true;
 	            return this;
 	        };
 
@@ -37,39 +40,17 @@ define(function () {
 	            var filter = 'blur(1px)';
 	            roll.css({'filter': filter,'-webkit-filter': filter,'-moz-filter': filter,'-o-filter': filter,'-ms-filter': filter});
 	            
-	            function doALoop(stopAt) {
-	                var index = stopAt,
-	                    rollsToDo = stopAt;
-
-	                if (stopAt === undefined) {
-	                    index = rollCount;
-	                    rollsToDo = (index - current) + 1;
-	                }
+	            function doALoop() {
+	                var rollsToDo = rollCount + 1;
 
 	                roll.animate({
-	                    'top': '-' + (100 * index) + 'px'
+	                    'top': '-' + (100 * rollCount) + 'px'
 	                }, {
 	                    complete: function () {
-	                        // stop once we have rolled with a custom value
-	                        if (stopAt !== undefined) {
-	                        	current = stopAt;
-	                        	started = false;
-	                        	this.stop = this.defaultStop;
-
-	                        	var filter = 'none';
-	            				roll.css({'filter': filter,'-webkit-filter': filter,'-moz-filter': filter,'-o-filter': filter,'-ms-filter': filter});
-
-	                            return;
-	                        }
-
-	                        current = 0;
-	                        roll.css('top', '0px');
-	                        
-	                        // if we have gotten a value for a final roll, roll with that, otherwise keep spinning
-	                        if (finalRoll === undefined) {
+	                        if (!stop) {
+	                        	current = 0;
+		                        roll.css('top', '0px');
 	                            doALoop();
-	                        } else {
-	                            doALoop(finalRoll);
 	                        }
 	                    },
 	                    easing: 'linear',
@@ -84,11 +65,30 @@ define(function () {
 	        return kill;
 	    }
 
-	    this.stop = this.defaultStop = function () {return this;};
+	    this.hardStop = function () {
+	    	current = this.getCurrent();
+	    	stopFunc();
+	    	
+	    	// stop animation
+	    	rolls.stop(true, false);
+
+	    	var filter = 'none';
+			rolls.css({'filter': filter,'-webkit-filter': filter,'-moz-filter': filter,'-o-filter': filter,'-ms-filter': filter});
+
+			// display rolled
+            rolls.animate({'top': -100 * Math.floor(current + 0.5) + 'px'}, {
+            	complete: function () {
+            		started = false;
+            	},
+            	easing: 'linear',
+            	queue: false,
+            	duration: 250
+            });
+	    };
 
 	    this.start = function () {
 	    	started = true;
-	    	this.stop = move();
+	    	stopFunc = move();
 
 	    	return this;
 	    };
