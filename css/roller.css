@@ -34,3 +34,9 @@
 	width: 16px;
 	height: 16px;
 }
+
+.currency {
+	font-family: monospace;
+	color: green;
+	margin-top: 0;
+}

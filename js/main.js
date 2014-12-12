@@ -9,104 +9,20 @@ requirejs.config({
     }
 });
 
-require(['big', 'roller', 'toast'], function (Big, Roller, Toast) {
-	var cash = new Big(0);
+var cash;
+require(['big', 'toast', 'slots'], function (Big, Toast, slots) {
+	cash = new Big(0);
 
     function tick(ticks) {
-        document.title = cash.toFixed(1);
+        document.title = cash.toPrecision(5);
+        var s = cash.toPrecision(18);
+        if (s.indexOf('e') === -1 && s.indexOf('.') !== -1)
+            s = s.substr(0, s.indexOf('.'));
+        $('#cash').html(s);
     }
 
-    var startTick = new Date();
-    var accumulated = 0;
-    var tickSize = 100;
-    setInterval(function () {
-        var now = new Date();
-        var dt = now - startTick;
-        startTick = now;
-
-        accumulated += dt;
-
-        var ticks = Math.floor(accumulated / tickSize);
-        accumulated %= tickSize;
-
-        tick(ticks * (tickSize / 1000));
-    }, tickSize);
-
-    var slots = [
-        // html,                                    3       1
-        ['<img src="img/slot/goldenseven.png">',    777,    100],
-        ['<img src="img/slot/cherry.png">',         250,    25],
-        ['<img src="img/slot/watermelon.png">',     100,    10],
-        ['<img src="img/slot/grape.png">',          100,    0],
-        ['<img src="img/slot/plum.png">',           100,    0],
-        ['<img src="img/slot/lemon.png">',            0,    0],
-    ];
-
-    var dataTable = $('<table class="slottable table"></table>');
-    dataTable.append('<tr><th></th><th>x3</th><th>x1</th></tr>');
-    for (var i = 0; i < slots.length; i++) {
-        var slot = slots[i];
-        var row = $('<tr></tr>');
-        row.append('<td>' + slot[0] + '</td>');
-        row.append('<td>' + slot[1] + '</td>');
-        row.append('<td>' + slot[2] + '</td>');
-
-        dataTable.append(row);
-    }
-
-    $('#slot').append(dataTable);
-
-    function createRoller() {
-        var r = $('<div class="roller"></div>');
-
-        for (var i = 0; i < slots.length; i++) {
-            var f = $('<div class="rollopt">' + i + '</div>');
-
-            f.html(slots[i][0]);
-
-            r.append(f);
-        }
-
-        return r;
-    }
-
-    // create rollers
     var currentRoller = 0;
-    var rollers = [];
-    for (var i = 0; i < 3; i++) {
-        rollers.push(new Roller(createRoller().appendTo('#slot')).start());
-    }
-
-    function payout() {
-        var s = rollers.map(function (roller, i) {
-            return Math.floor(roller.getCurrent() + 0.5);
-        });
-
-        // count up number of each index
-        var counts = {};
-        for (var i = 0; i < s.length; i++) {
-            if (counts[s[i]] === undefined) {
-                counts[s[i]] = 1;
-            } else {
-                counts[s[i]]++;
-            }
-        }
-        
-        var pay = 0;
-
-        for (var j = 0; j < slots.length; j++) {
-            // any 3 same
-            console.log(counts[j], slots[j]);
-            if (counts[j] >= 3) {
-                pay += slots[j][1];
-            } else if (counts[j] >= 1) {
-                pay += slots[j][2] * counts[j];
-            }
-        }
-        console.log('Payout', pay);
-
-        return pay;
-    }
+    var rollers = slots.createRollers('#slot', 3);
 
     var last = Date.now();
     $("#btnRoll").click(function () {
@@ -136,7 +52,7 @@ require(['big', 'roller', 'toast'], function (Big, Roller, Toast) {
 
             // payout
             if (currentRoller == rollers.length) {
-                var pay = payout();
+                var pay = slots.payout(rollers);
                 cash = cash.plus(pay);
                 
                 var toast = Toast.create(this, "+$" + pay);
@@ -146,4 +62,45 @@ require(['big', 'roller', 'toast'], function (Big, Roller, Toast) {
             roller.start();
         }
     });
+
+
+    // == Load / save ==
+    function load () {
+        if (localStorage.icSlots) {
+            slots.slots = JSON.parse(localStorage.icSlots);
+        }
+        if (localStorage.icCash) {
+            cash = new Big(localStorage.icCash);
+        }
+    }
+    load();
+
+    function save () {
+        localStorage.icSlots = JSON.stringify(slots.slots);
+        localStorage.icCash = cash.toString();
+    }
+
+    setInterval(save, 1000 * 60);
+
+    $(window).unload(function() {
+        save();
+    });
+
+
+    // == Ticks ==
+    var startTick = new Date();
+    var accumulated = 0;
+    var tickSize = 100;
+    setInterval(function () {
+        var now = new Date();
+        var dt = now - startTick;
+        startTick = now;
+
+        accumulated += dt;
+
+        var ticks = Math.floor(accumulated / tickSize);
+        accumulated %= tickSize;
+
+        tick(ticks * (tickSize / 1000));
+    }, tickSize);
 });
