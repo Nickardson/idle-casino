@@ -8,10 +8,27 @@
     </head>
     <body>
     	<h2 class="currency">$<span id="cash">0</span></h2>
-    	<div id="slot"></div>
+    	
+    	<table id="main-table"><tr>
+	    	<td><table class="slottable table"></table></td>
+	    	<td>
+	    		<div id="tabs">
+	    			<a href="#tabSlotMachine" data-toggle="tab">Slot Machine</a>
+	    			<a href="#tabStore" data-toggle="tab">Store</a>
+	    		</div>
 
-    	<button class="btn btn-primary" id="btnRoll">Roll</button>
+	    		<div class="tab-content">
+				    <div class="tab-pane active" id="tabSlotMachine">
+				    	<div id="slot"></div>
+	    				<button class="btn btn-primary" id="btnRoll">Roll</button>	    			
+				    </div>
 
+				    <div class="tab-pane" id="tabStore">N/A</div>
+				</div>
+	    	</td>
+    	</tr></table>
+
+        <script src="js/bootstrap.min.js"></script>
         <script data-main="js/main" src="js/require/require.js"></script>
 	</body>
 </html>

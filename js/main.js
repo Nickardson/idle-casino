@@ -68,6 +68,7 @@ require(['big', 'toast', 'slots'], function (Big, Toast, slots) {
     function load () {
         if (localStorage.icSlots) {
             slots.slots = JSON.parse(localStorage.icSlots);
+            slots.populateDataTable();
         }
         if (localStorage.icCash) {
             cash = new Big(localStorage.icCash);
@@ -77,6 +78,7 @@ require(['big', 'toast', 'slots'], function (Big, Toast, slots) {
 
     function save () {
         localStorage.icSlots = JSON.stringify(slots.slots);
+
         localStorage.icCash = cash.toString();
     }
 

@@ -37,9 +37,6 @@ define(function () {
 	        rolls.each(function (_, roll) {
 	            roll = $(roll);
 
-	            var filter = 'blur(1px)';
-	            roll.css({'filter': filter,'-webkit-filter': filter,'-moz-filter': filter,'-o-filter': filter,'-ms-filter': filter});
-	            
 	            function doALoop() {
 	                var rollsToDo = rollCount + 1;
 
@@ -72,10 +69,7 @@ define(function () {
 	    	// stop animation
 	    	rolls.stop(true, false);
 
-	    	var filter = 'none';
-			rolls.css({'filter': filter,'-webkit-filter': filter,'-moz-filter': filter,'-o-filter': filter,'-ms-filter': filter});
-
-			// display rolled
+	    	// display rolled
             rolls.animate({'top': -100 * current + 'px'}, {
             	complete: function () {
             		started = false;

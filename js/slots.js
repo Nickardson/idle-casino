@@ -1,5 +1,6 @@
 define(['roller'], function (Roller) {
-	var slots = [
+	var slots = {};
+	slots.slots = [
         // html,                                    3       1
         ['<img src="img/slot/goldenseven.png">',    777,    100],
         ['<img src="img/slot/cherry.png">',         250,    25],
@@ -9,19 +10,20 @@ define(['roller'], function (Roller) {
         ['<img src="img/slot/lemon.png">',            0,    0],
     ];
 
-    var dataTable = $('<table class="slottable table"></table>');
-    dataTable.append('<tr><th></th><th>x3</th><th>x1</th></tr>');
-    for (var i = 0; i < slots.length; i++) {
-        var slot = slots[i];
-        var row = $('<tr></tr>');
-        row.append('<td>' + slot[0] + '</td>');
-        row.append('<td>' + slot[1] + '</td>');
-        row.append('<td>' + slot[2] + '</td>');
+    function populateDataTable() {
+    	var dataTable = $('.slottable').empty();
+	    dataTable.append('<tr><th></th><th>x3</th><th>x1</th></tr>');
+	    for (var i = 0; i < slots.slots.length; i++) {
+	        var slot = slots.slots[i];
+	        var row = $('<tr></tr>');
+	        row.append('<td>' + slot[0] + '</td>');
+	        row.append('<td>' + slot[1] + '</td>');
+	        row.append('<td>' + slot[2] + '</td>');
 
-        dataTable.append(row);
+	        dataTable.append(row);
+	    }
     }
-
-    $('#slot').append(dataTable);
+    populateDataTable();
 
     /**
      * Determines the payout for the given rollers
@@ -45,13 +47,12 @@ define(['roller'], function (Roller) {
         
         var pay = 0;
 
-        for (var j = 0; j < slots.length; j++) {
+        for (var j = 0; j < slots.slots.length; j++) {
             // any 3 same
-            console.log(counts[j], slots[j]);
             if (counts[j] >= 3) {
-                pay += slots[j][1];
+                pay += slots.slots[j][1];
             } else if (counts[j] >= 1) {
-                pay += slots[j][2] * counts[j];
+                pay += slots.slots[j][2] * counts[j];
             }
         }
         console.log('Payout', pay);
@@ -62,10 +63,10 @@ define(['roller'], function (Roller) {
     function createRoller() {
 		var r = $('<div class="roller"></div>');
 
-		for (var i = 0; i < slots.length; i++) {
+		for (var i = 0; i < slots.slots.length; i++) {
 		    var f = $('<div class="rollopt">' + i + '</div>');
 
-		    f.html(slots[i][0]);
+		    f.html(slots.slots[i][0]);
 
 		    r.append(f);
 		}
@@ -87,10 +88,10 @@ define(['roller'], function (Roller) {
 	    return rollers;
     }
 
-    return {
-    	'slots': slots,
-    	'payout': payout,
-    	'createRoller': createRoller,
-    	'createRollers': createRollers
-    };
+    slots.payout = payout;
+	slots.createRoller = createRoller;
+	slots.createRollers = createRollers;
+	slots.populateDataTable = populateDataTable;
+
+    return slots;
 });
