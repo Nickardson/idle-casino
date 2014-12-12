@@ -16,5 +16,21 @@
 	font-size: 72px;
 	font-weight: bold;
 	color: white;
-	background-color: gray;
+}
+
+.rollopt>img {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.slottable {
+	width: auto;
+	font-family: monospace;
+	float: left;
+	margin-right: 10px;
+}
+.slottable img {
+	width: 16px;
+	height: 16px;
 }

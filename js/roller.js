@@ -76,7 +76,7 @@ define(function () {
 			rolls.css({'filter': filter,'-webkit-filter': filter,'-moz-filter': filter,'-o-filter': filter,'-ms-filter': filter});
 
 			// display rolled
-            rolls.animate({'top': -100 * Math.floor(current + 0.5) + 'px'}, {
+            rolls.animate({'top': -100 * current + 'px'}, {
             	complete: function () {
             		started = false;
             	},
@@ -94,16 +94,14 @@ define(function () {
 	    };
 
 	    function getCurrent () {
-	    	if (!started) {
-	    		return 0;
-	    	}
+	    	var topKek = rolls[0].style.top;
 
-	        var topKek = rolls[0].style.top;
-	        topKek = -parseInt(topKek.substring(0, topKek.indexOf('px')));
-	        if (topKek > (rollCount + 1) * 100) {
+	        topKek = Math.floor(-parseInt(topKek.substring(0, topKek.indexOf('px'))) / 100 + 0.5);
+	        if (topKek > rollCount) {
+	        	console.log(topKek, 'exceeds', rollCount+1);
 	            return 0;
 	        } else {
-	            return topKek / 100;
+	        	return topKek % rollCount;
 	        }
 	    }
 
