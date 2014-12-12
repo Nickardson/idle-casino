@@ -9,7 +9,7 @@ requirejs.config({
     }
 });
 
-require(['big'], function (Big) {
+require(['big', 'roller'], function (Big, Roller) {
 	var cash = new Big(0);
 
     function tick(ticks) {
@@ -34,4 +34,15 @@ require(['big'], function (Big) {
 
         tick(ticks * (tickSize / 1000));
     }, tickSize);
+
+
+    var roller = new Roller($('.roller')[0]);
+
+    $("#btnRoll").click(function () {
+        if (roller.isRolling()) {
+            roller.stop(roller.getCurrent() + 0.5);
+        } else {
+            roller.start();
+        }
+    });
 });
